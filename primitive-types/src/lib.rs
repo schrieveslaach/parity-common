@@ -13,6 +13,7 @@
 //! rlp encoding.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![feature(step_trait)]
 
 #[cfg(feature = "fp-conversion")]
 mod fp_conversion;
@@ -248,5 +249,17 @@ impl<'a> TryFrom<&'a U512> for U256 {
 		ret[2] = arr[2];
 		ret[3] = arr[3];
 		Ok(U256(ret))
+	}
+}
+
+impl std::iter::Step for U256 {
+	fn steps_between(start: &Self, end: &Self) -> Option<usize> {
+		Some((end - start).as_usize())
+	}
+	fn forward_checked(start: Self, count: usize) -> Option<Self> {
+		start.checked_add(U256::from(count))
+	}
+	fn backward_checked(start: Self, count: usize) -> Option<Self> {
+		start.checked_sub(U256::from(count))
 	}
 }
